@@ -29,51 +29,49 @@ namespace Weather.WeatherService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[0];
+            return new ServiceReplicaListener[] { new ServiceReplicaListener(context => new HttpCommunicationListener(context)) };
         }
 
-        /// <summary>
-        /// This is the main entry point for your service replica.
-        /// This method executes when this replica of your service becomes primary and has write status.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+        public async Task<Forecast> GetForecastAsync(string zipCode)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
+            ServiceEventSource.Current.ServiceMessage(Context, "Retrieving forecast for zip code: {0}", zipCode);
 
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
+            var forecasts = await StateManager.GetOrAddAsync<IReliableDictionary<string, Forecast>>("Forecasts")
+                .ConfigureAwait(false);
 
-            while (true)
+            Forecast forecast;
+
+            using (var tx = StateManager.CreateTransaction())
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                var conditionalValue = await forecasts.TryGetValueAsync(tx, zipCode)
+                    .ConfigureAwait(false);
 
-                using (var tx = this.StateManager.CreateTransaction())
-                {
-                    var result = await myDictionary.TryGetValueAsync(tx, "Counter");
+                ServiceEventSource.Current.ServiceMessage(Context, "Temperature for zip code: {0} is {1}", zipCode, conditionalValue.HasValue ? conditionalValue.Value.Temperature.ToString() : "unknown");
 
-                    ServiceEventSource.Current.ServiceMessage(this.Context, "Current Counter Value: {0}",
-                        result.HasValue ? result.Value.ToString() : "Value does not exist.");
+                await tx.CommitAsync();
 
-                    await myDictionary.AddOrUpdateAsync(tx, "Counter", 0, (key, value) => ++value);
-
-                    // If an exception is thrown before calling CommitAsync, the transaction aborts, all changes are 
-                    // discarded, and nothing is saved to the secondary replicas.
-                    await tx.CommitAsync();
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                forecast = conditionalValue.HasValue ? conditionalValue.Value : null;
             }
+
+            return forecast;
         }
 
-        public Forecast GetForecast(string zipCode)
+        public async Task AddForecastAsync(Forecast forecast)
         {
-            throw new NotImplementedException();
-        }
+            ServiceEventSource.Current.ServiceMessage(Context, "Adding forecast for zip code: {0}", forecast.ZipCode);
 
-        public void AddForecast(Forecast forecast)
-        {
-            throw new NotImplementedException();
+            var forecasts = await StateManager.GetOrAddAsync<IReliableDictionary<string, Forecast>>("Forecasts")
+                .ConfigureAwait(false);
+
+            using (var tx = StateManager.CreateTransaction())
+            {
+                await forecasts.TryAddAsync(tx, forecast.ZipCode, forecast)
+                    .ConfigureAwait(false);
+                
+                ServiceEventSource.Current.ServiceMessage(Context, "Added forecast for zip code: {0}", forecast.ZipCode);
+
+                await tx.CommitAsync();
+            }
         }
     }
 }
