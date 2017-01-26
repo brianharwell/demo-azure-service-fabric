@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Weather.Contracts;
 
 namespace Weather.WeatherService
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class WeatherService : StatefulService
+    internal sealed class WeatherService : StatefulService, ILocationService
     {
         public WeatherService(StatefulServiceContext context)
             : base(context)
@@ -63,6 +64,16 @@ namespace Weather.WeatherService
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
+        }
+
+        public Forecast GetForecast(string zipCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddForecast(Forecast forecast)
+        {
+            throw new NotImplementedException();
         }
     }
 }
