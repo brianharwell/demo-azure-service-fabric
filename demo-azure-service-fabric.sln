@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather.WeatherService", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather.Contracts", "Weather.Contracts\Weather.Contracts.csproj", "{FEDD986C-2760-4711-90D7-C9223CA3A9C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather.WebApi", "Weather.WebApi\Weather.WebApi.csproj", "{501E49DF-1299-4588-A288-EF62B55AD880}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,12 @@ Global
 		{FEDD986C-2760-4711-90D7-C9223CA3A9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FEDD986C-2760-4711-90D7-C9223CA3A9C1}.Release|x64.ActiveCfg = Release|Any CPU
 		{FEDD986C-2760-4711-90D7-C9223CA3A9C1}.Release|x64.Build.0 = Release|Any CPU
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Debug|x64.ActiveCfg = Debug|x64
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Debug|x64.Build.0 = Debug|x64
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Release|Any CPU.ActiveCfg = Release|x64
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Release|x64.ActiveCfg = Release|x64
+		{501E49DF-1299-4588-A288-EF62B55AD880}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

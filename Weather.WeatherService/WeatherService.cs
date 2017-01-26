@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Weather.Contracts;
 
@@ -29,7 +31,12 @@ namespace Weather.WeatherService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[] { new ServiceReplicaListener(context => new HttpCommunicationListener(context)) };
+            return new ServiceReplicaListener[]
+                       {
+                           //new ServiceReplicaListener(context => new HttpCommunicationListener(context)),
+                           new ServiceReplicaListener(this.CreateServiceRemotingListener)
+                           //new ServiceReplicaListener(context => new FabricTransportServiceRemotingListener(context, this)), 
+                       };
         }
 
         public async Task<Forecast> GetForecastAsync(string zipCode)
